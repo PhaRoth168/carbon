@@ -2,130 +2,164 @@
 <html lang="km">
 <head>
     <meta charset="UTF-8">
-    <title>Minecraft Carbon Hero - Ultimate Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Carbon Hero: Ultimate Nature</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
-    <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-        body { margin: 0; font-family: 'Orbitron', sans-serif; overflow: hidden; }
+        body { margin: 0; overflow: hidden; font-family: 'Orbitron', sans-serif; }
         
-        /* Dashboard ស្ទីលកាបូន អាជីព */
+        /* Dashboard ស្ទីលស្អាតបំផុត */
         #dashboard {
-            position: fixed; top: 30px; left: 30px; z-index: 100;
-            background: rgba(0, 20, 10, 0.85);
-            padding: 25px; border-left: 5px solid #00ff88;
-            border-radius: 0 15px 15px 0; color: #00ff88;
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
-            backdrop-filter: blur(10px); pointer-events: none;
+            position: fixed; top: 25px; left: 25px; z-index: 100;
+            background: rgba(0, 20, 10, 0.8); padding: 20px;
+            border-left: 4px solid #00ff88; border-radius: 0 15px 15px 0;
+            color: white; backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            pointer-events: none;
         }
-        .label { font-size: 12px; letter-spacing: 2px; color: #fff; opacity: 0.7; }
-        .value { font-size: 35px; font-weight: bold; text-shadow: 0 0 10px #00ff88; margin-bottom: 15px; }
+        .stat-label { font-size: 10px; letter-spacing: 2px; color: #00ff88; margin-bottom: 5px; }
+        .stat-value { font-size: 32px; font-weight: bold; text-shadow: 0 0 10px #00ff88; }
         
         /* ប៊ូតុងតន្ត្រី */
-        #music-control {
+        #music-btn {
             position: fixed; bottom: 30px; left: 30px; z-index: 100;
-            background: rgba(255, 255, 255, 0.1); border: 1px solid #00ff88;
-            color: white; padding: 10px; border-radius: 50%; cursor: pointer;
+            background: rgba(0, 255, 136, 0.2); border: 1px solid #00ff88;
+            color: white; padding: 15px; border-radius: 50%; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
     <div id="dashboard">
-        <div class="label">TREES PLANTED</div>
-        <div id="score" class="value">0</div>
-        <div class="label">CARBON OFFSET</div>
-        <div id="carbon" class="value">0.00 KG</div>
-        <div style="font-size: 10px; color: #fff;">CORE STATUS: OPTIMIZED</div>
+        <div class="stat-label">TREES PLANTED</div>
+        <div id="tree-count" class="stat-value">0</div>
+        <div class="stat-label" style="margin-top: 15px;">CARBON CAPTURED</div>
+        <div id="carbon-count" class="stat-value">0.0 KG</div>
     </div>
 
-    <button id="music-control" onclick="toggleMusic()">🎵</button>
+    <button id="music-btn" onclick="toggleMusic()">🎵</button>
 
     <a-scene 
         webxr="optionalFeatures: hit-test, local-floor, vr, ar;" 
-        renderer="antialias: true; colorManagement: true; exposure: 1.2;"
+        renderer="antialias: true; colorManagement: true; exposure: 1.1;"
         cursor="rayOrigin: mouse"
         raycaster="objects: .clickable">
 
         <a-assets>
-            <audio id="bgm" src="https://cdn.pixabay.com/audio/2022/01/21/audio_31b530ba54.mp3" preload="auto" loop="true"></audio>
-            <audio id="pop-sound" src="https://cdn.pixabay.com/audio/2021/08/04/audio_06d6a5f782.mp3" preload="auto"></audio>
+            <audio id="bgm" src="https://cdn.pixabay.com/audio/2022/03/15/audio_73063539e0.mp3" preload="auto" loop="true"></audio>
+            <audio id="pop" src="https://cdn.pixabay.com/audio/2021/08/04/audio_06d6a5f782.mp3" preload="auto"></audio>
         </a-assets>
 
-        <a-entity environment="preset: forest; seed: 42; dressingAmount: 15; groundColor: #1a2a1a; skyColor: #224488; lighting: point;"></a-entity>
-        <a-light type="ambient" intensity="0.6"></a-light>
-        <a-light type="directional" position="1 5 1" intensity="1.2" castShadow="true"></a-light>
+        <a-entity id="world-env" environment="preset: volcano; seed: 44; dressing: trees; dressingAmount: 80; dressingColor: #2d5a27; groundColor: #1a2a1a; lighting: point; shadow: true;"></a-entity>
 
         <a-entity id="rig">
             <a-entity camera look-controls wasd-controls position="0 1.6 0">
-                <a-entity id="weapon-hand" position="0.5 -0.4 -0.6" rotation="0 -90 15">
-                    <a-box width="0.04" height="0.7" depth="0.04" color="#4b2d0b"></a-box>
-                    <a-box width="0.25" height="0.25" depth="0.06" color="#00f2ff" position="0 0.35 0" material="emissive: #00f2ff; emissiveIntensity: 0.5"></a-box>
+                <a-entity position="0.5 -0.4 -0.6" rotation="0 -90 15">
+                    <a-box width="0.04" height="0.6" depth="0.04" color="#4b2d0b"></a-box>
+                    <a-box width="0.2" height="0.2" depth="0.05" color="#00f2ff" material="emissive: #00f2ff; emissiveIntensity: 0.5"></a-box>
                 </a-entity>
                 <a-entity cursor="fuse: false" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.015; radiusOuter: 0.02" material="color: #00ff88; shader: flat"></a-entity>
             </a-entity>
         </a-entity>
 
-        <a-plane class="clickable" rotation="-90 0 0" width="1000" height="1000" visible="false"></a-plane>
+        <a-entity id="carbon-cloud"></a-entity>
 
+        <a-entity id="animal-group"></a-entity>
+
+        <a-plane class="clickable" rotation="-90 0 0" width="1000" height="1000" visible="false"></a-plane>
+        
         <a-entity id="forest-master"></a-entity>
 
     </a-scene>
 
     <script>
+        const scene = document.querySelector('a-scene');
         const forest = document.getElementById('forest-master');
-        const scoreUI = document.getElementById('score');
-        const carbonUI = document.getElementById('carbon');
-        const popSound = document.getElementById('pop-sound');
+        const carbonCloud = document.getElementById('carbon-cloud');
+        const animalGroup = document.getElementById('animal-group');
         const bgm = document.getElementById('bgm');
-        let count = 0;
+        const popSound = document.getElementById('pop');
 
-        // មុខងារដាំឈើ
-        document.querySelector('a-scene').addEventListener('click', function (evt) {
-            if (evt.detail.intersection) {
-                const p = evt.detail.intersection.point;
-                plantTree(p);
+        let trees = 0;
+
+        // បង្កើតគ្រាប់កាបូន (Carbon Particles)
+        for (let i = 0; i < 60; i++) {
+            let p = document.createElement('a-sphere');
+            p.setAttribute('radius', '0.04');
+            p.setAttribute('color', '#222');
+            p.setAttribute('opacity', '0.8');
+            let startPos = { x: (Math.random()-0.5)*30, y: Math.random()*6 + 1, z: (Math.random()-0.5)*30 };
+            p.setAttribute('position', startPos);
+            p.setAttribute('animation', `property: position; to: ${startPos.x} ${startPos.y+1} ${startPos.z}; dur: ${2000 + Math.random()*3000}; dir: alternate; loop: true; easing: easeInOutSine`);
+            p.classList.add('carbon-dot');
+            carbonCloud.appendChild(p);
+        }
+
+        // បង្កើតសត្វជ្រូក
+        function createPig() {
+            let pig = document.createElement('a-entity');
+            let x = (Math.random()-0.5)*15;
+            let z = (Math.random()-0.5)*15;
+            pig.setAttribute('position', {x: x, y: 0, z: z});
+            pig.innerHTML = `
+                <a-box width="0.5" height="0.3" depth="0.35" color="#ff99aa"></a-box>
+                <a-box width="0.25" height="0.25" depth="0.25" position="0.35 0.15 0" color="#ff99aa"></a-box>
+            `;
+            pig.setAttribute('animation', `property: position; to: ${x + (Math.random()-0.5)*5} 0 ${z + (Math.random()-0.5)*5}; dur: 8000; dir: alternate; loop: true`);
+            animalGroup.appendChild(pig);
+        }
+        for(let i=0; i<4; i++) createPig();
+
+        // មុខងារដាំដើមឈើ
+        scene.addEventListener('click', (e) => {
+            if (e.detail.intersection) {
+                const pos = e.detail.intersection.point;
+                plantTree(pos);
             }
         });
 
         function plantTree(pos) {
             const tree = document.createElement('a-entity');
             tree.setAttribute('position', pos);
-            
-            // រចនាដើមឈើ Minecraft លម្អិត
             tree.innerHTML = `
-                <a-box position="0 0.4 0" width="0.25" height="0.8" depth="0.25" color="#3d2109"></a-box>
+                <a-box position="0 0.4 0" width="0.2" height="0.8" depth="0.2" color="#4b2d0b"></a-box>
                 <a-entity position="0 1.1 0" animation="property: scale; from: 0 0 0; to: 1 1 1; dur: 800; easing: easeOutElastic">
-                    <a-box position="0 0.2 0" width="0.8" height="0.8" depth="0.8" color="#1a5d1a"></a-box>
-                    <a-box position="0 0.6 0" width="0.5" height="0.5" depth="0.5" color="#2d8a2d"></a-box>
-                    <a-entity particle-system="preset: snow; color: #00ff88; particleCount: 20; size: 0.1; duration: 1"></a-entity>
+                    <a-box position="0 0.3 0" width="0.8" height="0.8" depth="0.8" color="#1a5d1a"></a-box>
+                    <a-box position="0 0.8 0" width="0.5" height="0.5" depth="0.5" color="#2d8a2d"></a-box>
                 </a-entity>
             `;
-            
             forest.appendChild(tree);
             
-            // Play Sound
-            popSound.currentTime = 0;
-            popSound.play().catch(e => console.log("Music needs interaction first"));
+            // សំឡេង និងពិន្ទុ
+            popSound.currentTime = 0; popSound.play();
+            trees++;
+            document.getElementById('tree-count').innerText = trees;
+            document.getElementById('carbon-count').innerText = (trees * 21.7).toFixed(1) + " KG";
 
-            // Update Stats
-            count++;
-            scoreUI.innerText = count;
-            carbonUI.innerText = (count * 21.7).toFixed(2) + " KG";
+            // ស្រូបកាបូនដែលនៅជិតបំផុត
+            const dots = document.querySelectorAll('.carbon-dot');
+            for(let i=0; i<3; i++) {
+                let dot = dots[Math.floor(Math.random()*dots.length)];
+                if(dot.getAttribute('visible') !== false) {
+                    dot.setAttribute('animation', `property: position; to: ${pos.x} ${pos.y+1} ${pos.z}; dur: 1200; easing: easeInBack`);
+                    setTimeout(() => dot.setAttribute('visible', 'false'), 1200);
+                }
+            }
         }
 
         function toggleMusic() {
-            if (bgm.paused) { bgm.play(); } else { bgm.pause(); }
+            if (bgm.paused) bgm.play(); else bgm.pause();
         }
 
-        // ស្វ័យប្រវត្តិបើក AR/VR ឱ្យស្អាត
-        const scene = document.querySelector('a-scene');
+        // រៀបចំ AR Mode
         scene.addEventListener('enter-vr', () => {
-            if (scene.is('ar-mode')) {
-                document.querySelector('[environment]').setAttribute('visible', 'false');
-            }
+            if (scene.is('ar-mode')) document.getElementById('world-env').setAttribute('visible', 'false');
+        });
+        scene.addEventListener('exit-vr', () => {
+            document.getElementById('world-env').setAttribute('visible', 'true');
         });
     </script>
 </body>
